@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MY_HANDLE_EVENT } from "./MyGroup";
 
 type Mode = "register" | "edit";
 
@@ -32,6 +33,8 @@ export default function HandleForm({ mode }: { mode: Mode }) {
       });
       form.reset();
       router.refresh(); // 조 목록 갱신
+      // 등록·수정 직후 '내 조' 카드에 바로 표시
+      window.dispatchEvent(new CustomEvent(MY_HANDLE_EVENT, { detail: json.handle }));
     } catch {
       setStatus({ ok: false, msg: "네트워크 오류예요. 다시 시도해주세요" });
     } finally {
