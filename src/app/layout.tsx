@@ -11,17 +11,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ko">
       <body className="flex min-h-dvh flex-col antialiased">
         {children}
-        <footer className="mt-auto pb-8 text-center text-xs text-neutral-400">
-          ©{" "}
+        <footer className="mt-auto flex flex-col items-center gap-2 pt-10 pb-8">
           <a
             href="https://www.instagram.com/darani.zip/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-neutral-700 hover:underline"
+            className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            darani
+            <span className="text-neutral-500">만든 사람</span>
+            <span className="bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 bg-clip-text font-semibold text-transparent">
+              @darani.zip
+            </span>
+            <span aria-hidden className="text-neutral-400">↗</span>
           </a>
-          . All rights reserved.
+          <p className="text-xs text-neutral-400">© darani. All rights reserved.</p>
         </footer>
       </body>
     </html>
