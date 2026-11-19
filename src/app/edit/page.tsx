@@ -7,6 +7,8 @@ export default function EditPage() {
       <header>
         <h1 className="text-2xl font-bold">정보 수정</h1>
         <p className="mt-1 text-sm text-neutral-500">
+          처음부터 함께한 분들의 비밀번호는 본인 인스타 아이디예요. 바꿔두는 걸 추천해요!
+          <br />
           비밀번호가 기억 안 나면 운영자에게 DM 주세요.
         </p>
       </header>

@@ -24,14 +24,31 @@ export async function POST(req: Request) {
   return NextResponse.json({ handle }, { status: 201 });
 }
 
-// 수정: { handle(현재), pw, newHandle }
+// 수정: { handle(현재), pw(현재), newHandle?, newPw? }  빈 칸은 그대로 유지
 export async function PATCH(req: Request) {
   const body = await req.json().catch(() => null);
   const handle = normalizeHandle(String(body?.handle ?? ""));
-  const newHandle = normalizeHandle(String(body?.newHandle ?? ""));
   if (!handle) return err("현재 아이디 형식이 이상해요");
-  if (!newHandle) return err("새 아이디 형식이 이상해요. 예: darani.zip");
-  if (typeof body?.pw !== "string") return err("비밀번호를 입력해주세요");
+  if (typeof body?.pw !== "string" || !body.pw) return err("현재 비밀번호를 입력해주세요");
+
+  const update: { handle?: string; pw_hash?: string; updated_at: string } = {
+    updated_at: new Date().toISOString(),
+  };
+
+  const rawNewHandle = String(body?.newHandle ?? "").trim();
+  if (rawNewHandle) {
+    const nh = normalizeHandle(rawNewHandle);
+    if (!nh) return err("새 아이디 형식이 이상해요. 예: darani.zip");
+    if (nh !== handle) update.handle = nh;
+  }
+
+  const newPw = String(body?.newPw ?? "");
+  if (newPw) {
+    if (!checkPw(newPw)) return err("새 비밀번호는 4~64자로 정해주세요");
+    update.pw_hash = await bcrypt.hash(newPw, 10);
+  }
+
+  if (!update.handle && !update.pw_hash) return err("바꿀 아이디나 새 비밀번호 중 하나는 입력해주세요");
 
   const client = db();
   const { data: row } = await client
@@ -44,12 +61,10 @@ export async function PATCH(req: Request) {
   const ok = row && (await bcrypt.compare(body.pw, row.pw_hash));
   if (!ok) return err("아이디 또는 비밀번호가 맞지 않아요", 401);
 
-  const { error } = await client
-    .from("participants")
-    .update({ handle: newHandle, updated_at: new Date().toISOString() })
-    .eq("id", row.id);
+  const { error } = await client.from("participants").update(update).eq("id", row.id);
   if (error?.code === "23505") return err("새 아이디는 이미 다른 사람이 등록했어요", 409);
   if (error) return err("수정 중 문제가 생겼어요", 500);
 
-  return NextResponse.json({ handle: newHandle });
+  const changed = [update.handle && "아이디", update.pw_hash && "비밀번호"].filter(Boolean).join("·");
+  return NextResponse.json({ handle: update.handle ?? handle, changed });
 }

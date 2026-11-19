@@ -29,7 +29,7 @@ export default function HandleForm({ mode }: { mode: Mode }) {
       if (!res.ok) return setStatus({ ok: false, msg: json.error });
       setStatus({
         ok: true,
-        msg: mode === "register" ? `@${json.handle} 등록 완료!` : `@${json.handle}(으)로 수정했어요`,
+        msg: mode === "register" ? `@${json.handle} 등록 완료!` : `@${json.handle} ${json.changed} 변경 완료!`,
       });
       form.reset();
       router.refresh(); // 조 목록 갱신
@@ -52,17 +52,21 @@ export default function HandleForm({ mode }: { mode: Mode }) {
         placeholder={mode === "register" ? "인스타 아이디 또는 프로필 URL" : "지금 등록된 아이디"}
         className={input}
       />
-      {mode === "edit" && (
-        <input name="newHandle" required autoCapitalize="none" placeholder="바꿀 아이디" className={input} />
-      )}
       <input
         name="pw"
         type="password"
         required
-        minLength={4}
-        placeholder={mode === "register" ? "수정용 비밀번호 (4자 이상)" : "등록할 때 정한 비밀번호"}
+        minLength={mode === "register" ? 4 : undefined}
+        placeholder={mode === "register" ? "수정용 비밀번호 (4자 이상)" : "현재 비밀번호"}
         className={input}
       />
+      {mode === "edit" && (
+        <>
+          <p className="mt-2 text-sm font-medium">바꿀 것만 입력하세요</p>
+          <input name="newHandle" autoCapitalize="none" autoCorrect="off" placeholder="바꿀 아이디 (선택)" className={input} />
+          <input name="newPw" type="password" minLength={4} placeholder="새 비밀번호 (선택, 4자 이상)" className={input} />
+        </>
+      )}
       <button
         disabled={loading}
         className="rounded-lg bg-neutral-900 py-2.5 font-medium text-white disabled:opacity-50"

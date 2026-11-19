@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 !.env.example
+
+# 기존 명단 시드 (임시 비번 포함 가능)
+supabase/seed.sql
