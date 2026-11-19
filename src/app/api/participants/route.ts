@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/supabase";
 import { normalizeHandle } from "@/lib/handle";
+import { clearHandlesCache } from "@/lib/picks";
 
 const err = (message: string, status = 400) => NextResponse.json({ error: message }, { status });
 
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
   if (error?.code === "23505") return err("이미 등록된 아이디예요. 잘못 입력했다면 '정보 수정'을 이용해주세요", 409);
   if (error) return err("저장 중 문제가 생겼어요. 잠시 후 다시 시도해주세요", 500);
 
+  clearHandlesCache();
   return NextResponse.json({ handle }, { status: 201 });
 }
 
@@ -65,6 +67,7 @@ export async function PATCH(req: Request) {
   if (error?.code === "23505") return err("새 아이디는 이미 다른 사람이 등록했어요", 409);
   if (error) return err("수정 중 문제가 생겼어요", 500);
 
+  if (update.handle) clearHandlesCache();
   const changed = [update.handle && "아이디", update.pw_hash && "비밀번호"].filter(Boolean).join("·");
   return NextResponse.json({ handle: update.handle ?? handle, changed });
 }

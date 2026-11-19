@@ -6,10 +6,21 @@ export const PICK_COUNT = 5;
 // 같은 5명이 유지되는 기간(일). 7로 바꾸면 일주일 고정
 export const PERIOD_DAYS = 1;
 
+// 전체 아이디 목록을 서버 메모리에 1분간 보관 → DB 조회(Supabase Egress)를 방문자 수와 무관하게 유지
+const CACHE_TTL_MS = 60_000;
+let cache: { at: number; handles: string[] } | null = null;
+
 export async function getAllHandles(): Promise<string[]> {
+  if (cache && Date.now() - cache.at < CACHE_TTL_MS) return cache.handles;
   const { data, error } = await db().from("participants").select("handle");
   if (error) throw error;
-  return data.map((r) => r.handle);
+  cache = { at: Date.now(), handles: data.map((r) => r.handle) };
+  return cache.handles;
+}
+
+// 등록·수정 직후 호출 → 이 서버에서는 바로 반영
+export function clearHandlesCache() {
+  cache = null;
 }
 
 // 한국 시간 기준 기간 번호 (자정에 바뀜)
