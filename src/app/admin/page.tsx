@@ -22,7 +22,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 py-12">
+    <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-12">
       <h1 className="text-2xl font-bold">운영자</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
         <input

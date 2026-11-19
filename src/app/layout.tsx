@@ -9,7 +9,21 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body className="antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col antialiased">
+        {children}
+        <footer className="mt-auto pb-8 text-center text-xs text-neutral-400">
+          ©{" "}
+          <a
+            href="https://www.instagram.com/darani.zip/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-neutral-700 hover:underline"
+          >
+            darani
+          </a>
+          . All rights reserved.
+        </footer>
+      </body>
     </html>
   );
 }

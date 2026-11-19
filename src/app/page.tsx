@@ -5,7 +5,7 @@ import Groups from "@/components/Groups";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 py-12">
+    <main className="mx-auto flex max-w-md flex-col gap-6 px-5 py-12">
       <header>
         <h1 className="text-2xl font-bold">인스타 품앗이 조 편성</h1>
         <p className="mt-1 text-sm text-neutral-500">
