@@ -1,15 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import CopyButton from "./CopyButton";
+import { profileUrl } from "@/lib/handle";
 
-type Assignment = {
-  handle: string;
-  myNo: number;
-  myGroup: string[];
-  targetNo: number | null;
-  target: string[];
-  totalGroups: number;
-};
+type Result = { handle: string; picks: string[]; total: number; periodDays: number };
 
 const KEY = "my-handle";
 const store = {
@@ -20,8 +14,8 @@ const store = {
 
 export const MY_HANDLE_EVENT = "my-handle-change";
 
-export default function MyGroup() {
-  const [data, setData] = useState<Assignment | null>(null);
+export default function MyPicks() {
+  const [data, setData] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +23,7 @@ export default function MyGroup() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/my-group?handle=${encodeURIComponent(handle)}`, { cache: "no-store" });
+      const res = await fetch(`/api/picks?handle=${encodeURIComponent(handle)}`, { cache: "no-store" });
       const json = await res.json();
       if (!res.ok) {
         setData(null);
@@ -56,12 +50,11 @@ export default function MyGroup() {
   }, [lookup]);
 
   if (data) {
+    const period = data.periodDays === 1 ? "오늘" : `이번 ${data.periodDays}일`;
     return (
       <section className="flex flex-col gap-3 rounded-xl bg-neutral-100 p-4">
         <div className="flex items-baseline justify-between">
-          <p className="font-semibold">
-            @{data.handle} 님은 <span className="text-blue-600">{data.myNo}조</span>
-          </p>
+          <p className="font-semibold">@{data.handle} 님의 {period}의 5명</p>
           <button
             onClick={() => { store.clear(); setData(null); }}
             className="text-xs text-neutral-500 underline"
@@ -70,24 +63,28 @@ export default function MyGroup() {
           </button>
         </div>
 
-        {data.targetNo === null ? (
-          <p className="text-sm text-neutral-600">
-            아직 조가 1개뿐이라 소환할 조가 없어요. 사람이 더 모이면 다시 확인해주세요!
-          </p>
+        {data.picks.length === 0 ? (
+          <p className="text-sm text-neutral-600">아직 혼자예요. 친구들을 불러주세요!</p>
         ) : (
           <div className="rounded-lg bg-white p-4">
             <div className="mb-2 flex items-center justify-between gap-3">
-              <span className="font-semibold">내가 소환할 조: {data.targetNo}조</span>
-              <CopyButton text={data.target.map((h) => `@${h}`).join(" ")} />
+              <span className="text-sm text-neutral-500">댓글에 붙여넣어 소환하세요</span>
+              <CopyButton text={data.picks.map((h) => `@${h}`).join(" ")} />
             </div>
-            <p className="break-all text-sm text-neutral-700">
-              {data.target.map((h) => `@${h}`).join(" ")}
-            </p>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+              {data.picks.map((h) => (
+                <li key={h}>
+                  <a href={profileUrl(h)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    @{h}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         <p className="text-xs text-neutral-500">
-          {data.myNo}조는 {data.myNo === 1 ? data.totalGroups : data.myNo - 1}조 분들이 소환해줘요.
-          새 참가자가 들어오면 마지막 조 구성은 바뀔 수 있어요.
+          총 {data.total}명 참여 중 · 5명은 {data.periodDays === 1 ? "매일 자정" : `${data.periodDays}일마다`} 바뀌어요
+          {data.picks.length > 0 && data.picks.length < 5 && " · 참여자가 늘면 5명까지 채워져요"}
         </p>
       </section>
     );
@@ -102,7 +99,7 @@ export default function MyGroup() {
       }}
       className="flex flex-col gap-2 rounded-xl bg-neutral-100 p-4"
     >
-      <p className="font-semibold">이미 등록했다면 내 조 확인</p>
+      <p className="font-semibold">이미 등록했다면 오늘의 5명 보기</p>
       <div className="flex gap-2">
         <input
           name="me"

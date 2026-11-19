@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MY_HANDLE_EVENT } from "./MyGroup";
+import { MY_HANDLE_EVENT } from "./MyPicks";
 
 type Mode = "register" | "edit";
 
