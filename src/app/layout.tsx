@@ -3,7 +3,13 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "인스타 품앗이 소환",
-  description: "등록하면 나를 뺀 5명이 매일 정해져요",
+  description: "등록하면 나를 뺀 5명이 매일 정해져요. 복사해서 댓글에 소환해요. 만든 사람 @darani.zip",
+  openGraph: {
+    title: "인스타 품앗이 소환",
+    description: "매일 나를 뺀 5명, 복사해서 댓글에 소환해요",
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
